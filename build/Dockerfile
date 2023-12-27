@@ -4,4 +4,6 @@ ARG TARGETPLATFORM
 ARG TARGETARCH
 
 # Copy *.so files from the previous stage
-COPY ./bin/$TARGETARCH/*.so /plugins/
+COPY bin/$TARGETARCH/*.so /plugins/
+
+CMD ["sh"]

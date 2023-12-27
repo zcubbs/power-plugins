@@ -86,6 +86,9 @@ jobs:
       - name: Build
         run: task build
 
+      - name: List files
+        run: tree -Cfi ./bin
+
       - name: Login to GHCR
         uses: docker/login-action@v2
         with:
@@ -122,11 +125,17 @@ jobs:
             echo "Tag $NEW_VERSION already exists and will not be overwritten."
           fi
 
+      - name: Create plugins tar archive
+        run: |
+          tar -czvf plugins_amd64.tar.gz bin/amd64
+          tar -czvf plugins_arm64.tar.gz bin/arm64
+
       - name: Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
         with:
           name: ${{ env.NEW_VERSION }}
           tag_name: ${{ env.NEW_VERSION }}
           files: |
-            bin/
+            plugins_amd64.tar.gz
+            plugins_arm64.tar.gz
 
