@@ -86,26 +86,8 @@ jobs:
           NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
-      - name: Create and push tag
-        run: |
-          if ! git rev-parse $NEW_VERSION >/dev/null 2>&1; then
-            git config --global user.name '${{ github.actor }}'
-            git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-            git add .
-            git commit --allow-empty -m 'bump version to ${{ env.NEW_VERSION }}'
-            git tag $NEW_VERSION
-            git push origin $NEW_VERSION
-          else
-            echo "Tag $NEW_VERSION already exists and will not be overwritten."
-          fi
-
-      - name: Release
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
-        with:
-          name: ${{ env.NEW_VERSION }}
-          tag_name: ${{ env.NEW_VERSION }}
-          files: |
-            ./bin/*.so
+      - name: Build
+        run: task build
 
       - name: Login to GHCR
         uses: docker/login-action@v2
@@ -129,4 +111,25 @@ jobs:
             ghcr.io/${{ github.repository }}:latest
             ghcr.io/${{ github.repository }}:${{ env.NEW_VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Create and push tag
+        run: |
+          if ! git rev-parse $NEW_VERSION >/dev/null 2>&1; then
+            git config --global user.name '${{ github.actor }}'
+            git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+            git add .
+            git commit --allow-empty -m 'bump version to ${{ env.NEW_VERSION }}'
+            git tag $NEW_VERSION
+            git push origin $NEW_VERSION
+          else
+            echo "Tag $NEW_VERSION already exists and will not be overwritten."
+          fi
+
+      - name: Release
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
+        with:
+          name: ${{ env.NEW_VERSION }}
+          tag_name: ${{ env.NEW_VERSION }}
+          files: |
+            ./bin/*.so
 
