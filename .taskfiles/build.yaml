@@ -1,0 +1,67 @@
+version: '3'
+
+tasks:
+  ############################################################
+  default:
+    desc: Run Build
+    cmds:
+      - task: build:amd64
+      - task: build:arm64
+  ############################################################
+  build:amd64:
+    internal: true
+    desc: Build All Plugins
+    cmds:
+      - for: ['go_apiserver']
+        cmd: go build -buildmode=plugin -o bin/amd64/{{.ITEM}}.so ./plugins/{{.ITEM}}/
+        dir: .
+        env:
+          GOOS: {{OS}}
+          GOARCH: amd64
+          CGO_ENABLED: 1
+          CC: x86_64-linux-gnu-gcc
+  ############################################################
+  build:arm64:
+    internal: true
+    desc: Build All Plugins
+    cmds:
+      - for: ['go_apiserver']
+        cmd: go build -buildmode=plugin -o bin/arm64/{{.ITEM}}.so ./plugins/{{.ITEM}}/
+        dir: .
+        env:
+          GOOS: {{OS}}
+          GOARCH: arm64
+          CGO_ENABLED: 1
+          CC: x86_64-linux-gnu-gcc
+  ############################################################
+  docker:
+    desc: Build Docker Images
+    cmds:
+      - task: docker:amd64
+
+  ############################################################
+  docker:amd64:
+    internal: true
+    desc: Build All Plugins
+    vars:
+      DOCKER_IMAGE_TAG: 8naps/power-plugins
+      ARCH: amd64
+    cmds:
+      - cmd: docker build --platform linux/amd64 --build-arg TARGETARCH={{.ARCH}} -t {{.DOCKER_IMAGE_TAG}} -f build/Dockerfile .
+
+  ############################################################
+  docker:arm64:
+    internal: true
+    desc: Build All Plugins
+    vars:
+      DOCKER_IMAGE_TAG: 8naps/power-plugins
+      ARCH: arm64
+    cmds:
+      - cmd: docker build --platform linux/arm64 --build-arg TARGETARCH={{.ARCH}} -t {{.DOCKER_IMAGE_TAG}} -f build/Dockerfile .
+
+  ############################################################
+  # list plugins installed in the docker image
+  list-plugins:
+    desc: List Plugins
+    cmds:
+      - cmd: docker run --rm -it 8naps/power-plugins:latest ls /plugins

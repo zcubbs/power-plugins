@@ -1,0 +1,19 @@
+version: '3'
+
+env:
+  GOOS: "{{OS}}"
+
+vars:
+  GO_PACKAGE: github.com/8naps/power-plugins
+  GO_PACKAGE_SHORT: power-plugins
+
+includes:
+  scan: .taskfiles/scan.yaml
+  test: .taskfiles/test.yaml
+  build: .taskfiles/build.yaml
+  lint: .taskfiles/lint.yaml
+  tools: .taskfiles/tools.yaml
+
+tasks:
+  default:
+    cmd: task -l

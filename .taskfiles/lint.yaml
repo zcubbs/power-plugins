@@ -1,0 +1,8 @@
+version: '3'
+
+tasks:
+  ############################################################
+  default:
+    desc: Run Go linter
+    cmds:
+      - golangci-lint run ./... -v

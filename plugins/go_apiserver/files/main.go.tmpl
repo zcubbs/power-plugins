@@ -1,0 +1,31 @@
+package main
+
+import (
+  "fmt"
+  "net/http"
+
+  "{{.GoPackage}}/database"
+  "{{.GoPackage}}/router"
+)
+
+func main() {
+  {{- if eq .Database "postgres"}}
+  // connect to the database using the DSN string localhost:5432
+  dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+    "localhost",
+    5432,
+    "postgres",
+    "postgres",
+    "postgres",
+  )
+  db, err := database.NewConnection(dsn)
+  if err != nil {
+    panic(err)
+  }
+  {{- end}}
+  // setup router
+  router := router.SetupRouter()
+
+  // run the server
+  http.ListenAndServe(":8000", r)
+}
