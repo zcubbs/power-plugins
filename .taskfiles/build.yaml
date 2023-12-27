@@ -18,7 +18,7 @@ tasks:
         env:
           GOOS: {{OS}}
           GOARCH: amd64
-          CGO_ENABLED: 1
+          CGO_ENABLED: 0
           CC: x86_64-linux-gnu-gcc
   ############################################################
   build:arm64:
@@ -31,7 +31,7 @@ tasks:
         env:
           GOOS: {{OS}}
           GOARCH: arm64
-          CGO_ENABLED: 1
+          CGO_ENABLED: 0
           CC: x86_64-linux-gnu-gcc
   ############################################################
   docker:
