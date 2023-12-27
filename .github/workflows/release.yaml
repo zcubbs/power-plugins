@@ -128,5 +128,5 @@ jobs:
           name: ${{ env.NEW_VERSION }}
           tag_name: ${{ env.NEW_VERSION }}
           files: |
-            ./bin/*.so
+            bin/
 
