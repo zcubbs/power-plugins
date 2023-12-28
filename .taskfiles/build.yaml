@@ -15,7 +15,7 @@ tasks:
     desc: Build All Plugins for Linux amd64
     cmds:
       - for: ['go_apiserver']
-        cmd: go build -o bin/linux_amd64/{{.ITEM}} ./plugins/{{.ITEM}}/
+        cmd: go build -o bin/linux/amd64/{{.ITEM}} ./plugins/{{.ITEM}}/
         env:
           GOOS: linux
           GOARCH: amd64
@@ -25,7 +25,7 @@ tasks:
     desc: Build All Plugins for Linux arm64
     cmds:
       - for: ['go_apiserver']
-        cmd: go build -o bin/linux_arm64/{{.ITEM}} ./plugins/{{.ITEM}}/
+        cmd: go build -o bin/linux/arm64/{{.ITEM}} ./plugins/{{.ITEM}}/
         env:
           GOOS: linux
           GOARCH: arm64
@@ -35,7 +35,7 @@ tasks:
     desc: Build All Plugins for macOS amd64
     cmds:
       - for: ['go_apiserver']
-        cmd: go build -o bin/darwin_amd64/{{.ITEM}} ./plugins/{{.ITEM}}/
+        cmd: go build -o bin/darwin/amd64/{{.ITEM}} ./plugins/{{.ITEM}}/
         env:
           GOOS: darwin
           GOARCH: amd64
@@ -45,7 +45,7 @@ tasks:
     desc: Build All Plugins for macOS arm64 (M1, M2 chips)
     cmds:
       - for: ['go_apiserver']
-        cmd: go build -o bin/darwin_arm64/{{.ITEM}} ./plugins/{{.ITEM}}/
+        cmd: go build -o bin/darwin/arm64/{{.ITEM}} ./plugins/{{.ITEM}}/
         env:
           GOOS: darwin
           GOARCH: arm64
@@ -55,7 +55,7 @@ tasks:
     desc: Build All Plugins for Windows amd64
     cmds:
       - for: ['go_apiserver']
-        cmd: go build -o bin/windows_amd64/{{.ITEM}}.exe ./plugins/{{.ITEM}}/
+        cmd: go build -o bin/windows/amd64/{{.ITEM}}.exe ./plugins/{{.ITEM}}/
         env:
           GOOS: windows
           GOARCH: amd64
