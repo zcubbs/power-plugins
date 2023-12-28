@@ -132,7 +132,6 @@ jobs:
           tar -czvf plugins_darwin_amd64.tar.gz bin/darwin/amd64
           tar -czvf plugins_darwin_arm64.tar.gz bin/darwin/arm64
           zip plugins_windows_amd64.zip bin/windows/amd64/*.exe
-          zip plugins_windows_arm64.zip bin/windows/arm64/*.exe
 
       - name: Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
@@ -145,5 +144,3 @@ jobs:
             plugins_darwin_amd64.tar.gz
             plugins_darwin_arm64.tar.gz
             plugins_windows_amd64.zip
-            plugins_windows_arm64.zip
-
