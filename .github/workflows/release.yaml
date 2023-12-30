@@ -83,35 +83,6 @@ jobs:
           NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
-      - name: Build
-        run: task build:build:basic
-
-      - name: List files
-        run: tree -Cfi ./bin
-
-      - name: Login to GHCR
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build and push image
-        uses: docker/build-push-action@v5.1.0
-        with:
-          context: .
-          file: ./build/Dockerfile.basic
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ env.NEW_VERSION }}
-          labels: ${{ steps.meta.outputs.labels }}
-
       - name: Create and push tag
         run: |
           if ! git rev-parse $NEW_VERSION >/dev/null 2>&1; then
@@ -125,26 +96,23 @@ jobs:
             echo "Tag $NEW_VERSION already exists and will not be overwritten."
           fi
 
-#      - name: Create plugins tar archive
-#        run: |
-#          tar -czvf plugins_linux_amd64.tar.gz bin/linux/amd64
-#          tar -czvf plugins_linux_arm64.tar.gz bin/linux/arm64
-#          tar -czvf plugins_darwin_amd64.tar.gz bin/darwin/amd64
-#          tar -czvf plugins_darwin_arm64.tar.gz bin/darwin/arm64
-#          zip plugins_windows_amd64.zip bin/windows/amd64/*.exe
-
-      - name: Create plugins tar archive
-        run: |
-          tar -czvf plugins_linux_amd64.tar.gz bin
-
       - name: Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
         with:
           name: ${{ env.NEW_VERSION }}
           tag_name: ${{ env.NEW_VERSION }}
-          files: |
-            plugins_linux_amd64.tar.gz
-#            plugins_linux_arm64.tar.gz
-#            plugins_darwin_amd64.tar.gz
-#            plugins_darwin_arm64.tar.gz
-#            plugins_windows_amd64.zip
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: goreleaser/goreleaser-action@7ec5c2b0c6cdda6e8bbb49444bc797dd33d74dd8 # v3.0.0
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release -f .goreleaser.yaml --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
