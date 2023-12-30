@@ -17,6 +17,8 @@ tasks:
     cmds:
       - cmd: go build -o bin/{{.ITEM}} ./plugins/{{.ITEM}}/...
         for: ['go_apiserver']
+        env:
+          CGO_ENABLED: 0 # Set to 1 if cgo is needed
   ############################################################
   build:linux_amd64:
     desc: Build All Plugins for Linux amd64
