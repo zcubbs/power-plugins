@@ -125,13 +125,17 @@ jobs:
             echo "Tag $NEW_VERSION already exists and will not be overwritten."
           fi
 
+#      - name: Create plugins tar archive
+#        run: |
+#          tar -czvf plugins_linux_amd64.tar.gz bin/linux/amd64
+#          tar -czvf plugins_linux_arm64.tar.gz bin/linux/arm64
+#          tar -czvf plugins_darwin_amd64.tar.gz bin/darwin/amd64
+#          tar -czvf plugins_darwin_arm64.tar.gz bin/darwin/arm64
+#          zip plugins_windows_amd64.zip bin/windows/amd64/*.exe
+
       - name: Create plugins tar archive
         run: |
-          tar -czvf plugins_linux_amd64.tar.gz bin/linux/amd64
-          tar -czvf plugins_linux_arm64.tar.gz bin/linux/arm64
-          tar -czvf plugins_darwin_amd64.tar.gz bin/darwin/amd64
-          tar -czvf plugins_darwin_arm64.tar.gz bin/darwin/arm64
-          zip plugins_windows_amd64.zip bin/windows/amd64/*.exe
+          tar -czvf plugins_linux_amd64.tar.gz bin
 
       - name: Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
@@ -140,7 +144,7 @@ jobs:
           tag_name: ${{ env.NEW_VERSION }}
           files: |
             plugins_linux_amd64.tar.gz
-            plugins_linux_arm64.tar.gz
-            plugins_darwin_amd64.tar.gz
-            plugins_darwin_arm64.tar.gz
-            plugins_windows_amd64.zip
+#            plugins_linux_arm64.tar.gz
+#            plugins_darwin_amd64.tar.gz
+#            plugins_darwin_arm64.tar.gz
+#            plugins_windows_amd64.zip
