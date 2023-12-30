@@ -84,7 +84,7 @@ jobs:
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Build
-        run: task build
+        run: task build:build:basic
 
       - name: List files
         run: tree -Cfi ./bin
@@ -104,7 +104,7 @@ jobs:
         uses: docker/build-push-action@v5.1.0
         with:
           context: .
-          file: ./build/Dockerfile
+          file: ./build/Dockerfile.basic
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |

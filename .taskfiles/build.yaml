@@ -11,6 +11,13 @@ tasks:
       - task: build:darwin_arm64
       - task: build:windows_amd64
   ############################################################
+  # Basic
+  build:basic:
+    desc: Build Basic Plugins
+    cmds:
+      - cmd: go build -o bin/{{.ITEM}} ./plugins/{{.ITEM}}/...
+        for: ['go_apiserver']
+  ############################################################
   build:linux_amd64:
     desc: Build All Plugins for Linux amd64
     cmds:
