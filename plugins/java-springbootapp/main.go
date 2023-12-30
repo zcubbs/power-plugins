@@ -32,6 +32,7 @@ func (g *Generator) LoadSpec() (blueprint.Spec, error) {
 	return blueprint.LoadBlueprintSpecFromBytes(specYaml)
 }
 
+// Generate implements the ComponentGenerator interface, generating a Go API server
 func (g *Generator) Generate(spec blueprint.Spec, values map[string]string, workdir string) error {
 	// Step 1: Parse ComponentSpec to get required configurations
 	config, err := parseConfig(spec, values)
@@ -58,55 +59,37 @@ func (g *Generator) Generate(spec blueprint.Spec, values map[string]string, work
 func parseConfig(spec blueprint.Spec, values map[string]string) (Config, error) {
 	var config Config
 
-	// iterate over options and set config values
-	// if no value is provided, use the default value
+	// Helper function to set config value with default if needed
+	setConfigValue := func(field *string, option blueprint.Option) {
+		value := values[option.ID]
+		if value == "" {
+			*field = option.Default
+		} else {
+			*field = value
+		}
+	}
+
+	// Iterate over options and set config values
 	for _, option := range spec.Options {
 		switch option.ID {
 		case "java_version":
-			config.JavaVersion = values[option.ID]
-			if config.JavaVersion == "" {
-				config.JavaVersion = option.Default
-			}
+			setConfigValue(&config.JavaVersion, option)
 		case "packaging":
-			config.Packaging = values[option.ID]
-			if config.Packaging == "" {
-				config.Packaging = option.Default
-			}
+			setConfigValue(&config.Packaging, option)
 		case "springBootVersion":
-			config.SpringBootVersion = values[option.ID]
-			if config.SpringBootVersion == "" {
-				config.SpringBootVersion = option.Default
-			}
+			setConfigValue(&config.SpringBootVersion, option)
 		case "dependencyManagement":
-			config.DependencyManagement = values[option.ID]
-			if config.DependencyManagement == "" {
-				config.DependencyManagement = option.Default
-			}
+			setConfigValue(&config.DependencyManagement, option)
 		case "metadataPackageName":
-			config.Metadata.PackageName = values[option.ID]
-			if config.Metadata.PackageName == "" {
-				config.Metadata.PackageName = option.Default
-			}
+			setConfigValue(&config.Metadata.PackageName, option)
 		case "metadataGroupId":
-			config.Metadata.GroupId = values[option.ID]
-			if config.Metadata.GroupId == "" {
-				config.Metadata.GroupId = option.Default
-			}
+			setConfigValue(&config.Metadata.GroupId, option)
 		case "metadataArtifactId":
-			config.Metadata.ArtifactId = values[option.ID]
-			if config.Metadata.ArtifactId == "" {
-				config.Metadata.ArtifactId = option.Default
-			}
+			setConfigValue(&config.Metadata.ArtifactId, option)
 		case "metadataName":
-			config.Metadata.Name = values[option.ID]
-			if config.Metadata.Name == "" {
-				config.Metadata.Name = option.Default
-			}
+			setConfigValue(&config.Metadata.Name, option)
 		case "metadataDescription":
-			config.Metadata.Description = values[option.ID]
-			if config.Metadata.Description == "" {
-				config.Metadata.Description = option.Default
-			}
+			setConfigValue(&config.Metadata.Description, option)
 		}
 	}
 
@@ -116,7 +99,7 @@ func parseConfig(spec blueprint.Spec, values map[string]string) (Config, error) 
 // createProjectStructure sets up the project directory and base files
 func createProjectStructure(outputPath string, config Config) (string, error) {
 	projectPath := filepath.Join(outputPath, "java-springbootapp")
-	if err := os.MkdirAll(projectPath, 0755); err != nil {
+	if err := os.MkdirAll(projectPath, 0750); err != nil {
 		return "", err
 	}
 
@@ -125,7 +108,7 @@ func createProjectStructure(outputPath string, config Config) (string, error) {
 
 	for _, dir := range dirs {
 		dirPath := filepath.Join(projectPath, dir)
-		if err := os.MkdirAll(dirPath, 0755); err != nil {
+		if err := os.MkdirAll(dirPath, 0750); err != nil {
 			return "", err
 		}
 	}
@@ -154,13 +137,12 @@ func generateProjectFiles(projectPath string, config Config) error {
 	return nil
 }
 
-func processTemplate(filePath, tmpl string, config Config) error {
+func processTemplate(fPath, tmpl string, config Config) error {
 	t, err := template.New("template").Parse(tmpl)
 	if err != nil {
 		return err
 	}
-
-	file, err := os.Create(filePath)
+	file, err := os.Create(filepath.Clean(fPath))
 	if err != nil {
 		return err
 	}

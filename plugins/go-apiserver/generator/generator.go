@@ -81,8 +81,8 @@ func parseConfig(spec blueprint.Spec, values map[string]string) (Config, error) 
 
 // createProjectStructure sets up the project directory and base files
 func createProjectStructure(outputPath string, config Config) (string, error) {
-	projectPath := filepath.Join(outputPath, "go_api_server")
-	if err := os.MkdirAll(projectPath, 0755); err != nil {
+	projectPath := filepath.Join(outputPath, "go-apiserver")
+	if err := os.MkdirAll(projectPath, 0750); err != nil {
 		return "", err
 	}
 
@@ -94,7 +94,7 @@ func createProjectStructure(outputPath string, config Config) (string, error) {
 
 	for _, dir := range dirs {
 		dirPath := filepath.Join(projectPath, dir)
-		if err := os.MkdirAll(dirPath, 0755); err != nil {
+		if err := os.MkdirAll(dirPath, 0750); err != nil {
 			return "", err
 		}
 	}
@@ -127,13 +127,13 @@ func generateProjectFiles(projectPath string, config Config) error {
 	return nil
 }
 
-func processTemplate(filePath, tmpl string, config Config) error {
+func processTemplate(fPath, tmpl string, config Config) error {
 	t, err := template.New("template").Parse(tmpl)
 	if err != nil {
 		return err
 	}
 
-	file, err := os.Create(filePath)
+	file, err := os.Create(filepath.Clean(fPath))
 	if err != nil {
 		return err
 	}
