@@ -5,5 +5,5 @@ tasks:
   default:
     desc: Run Build
     cmds:
-      - cmd: go build -o bin/{{.ITEM}} ./plugins/{{.ITEM}}/...
+      - cmd: go build -o bin/{{.ITEM}} ./plugins/{{.ITEM}}/main.go
         for: ['go_apiserver']
