@@ -6,4 +6,4 @@ tasks:
     desc: Run Build
     cmds:
       - cmd: go build -o bin/{{.ITEM}} ./plugins/{{.ITEM}}/main.go
-        for: ['go_apiserver']
+        for: ['go-apiserver', 'java-springbootapp']

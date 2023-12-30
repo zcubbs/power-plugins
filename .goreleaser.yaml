@@ -7,15 +7,25 @@ before:
     - go mod tidy
 builds:
   - env: [CGO_ENABLED=0]
-    binary: go_apiserver
+    binary: go-apiserver
     goos:
       - linux
     goarch:
       - amd64
       - arm64
-    id: "go_apiserver"
+    id: "go-apiserver"
     dir: .
-    main: plugins/go_apiserver/main.go
+    main: plugins/go-apiserver/main.go
+  - env: [CGO_ENABLED=0]
+    binary: java-springbootapp
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    id: "java-springbootapp"
+    dir: .
+    main: plugins/java-springbootapp/main.go
 
 archives:
   - id: plugins-archive
@@ -23,7 +33,8 @@ archives:
     files:
       - none*
     builds:
-      - go_apiserver
+      - go-apiserver
+      - java-springbootapp
     format_overrides:
       - goos: windows
         format: zip
