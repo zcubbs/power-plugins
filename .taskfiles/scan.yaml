@@ -5,5 +5,5 @@ tasks:
   default:
     desc: Run security scanner using gosec
     cmds:
-      - gosec -conf .gosec.config.json "./..." || echo "Security scan failed. Check the gosec configuration."
+      - gosec -conf .gosec.config.json "./..."
 
