@@ -3,10 +3,12 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"github.com/8naps/power-plugins/plugins/java-springbootapp/generator"
 	"github.com/hashicorp/go-plugin"
 	"github.com/zcubbs/blueprint"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 )
 
@@ -116,19 +118,23 @@ func createProjectStructure(outputPath string, config Config) (string, error) {
 	return projectPath, nil
 }
 
-// go:embed templates/pom.xml
-var pomXmlTemplate string
-
 // generateProjectFiles generates project files based on the parsed config
 func generateProjectFiles(projectPath string, config Config) error {
 	// Define the file paths and corresponding templates
 	files := map[string]string{
-		"pom.xml": pomXmlTemplate,
+		"pom.xml": generator.PomXmlTemplate,
+		"src/main/java/{{.Metadata.PackageName}}/Application.java":     generator.MainJavaTemplate,
+		"src/main/java/{{.Metadata.PackageName}}/HelloController.java": generator.HelloControllerJavaTemplate,
 	}
 
 	// Process each template and create files
 	for filePath, tmpl := range files {
-		fullPath := filepath.Join(projectPath, filePath)
+		// Replace placeholders in the file path
+		fullPath, err := replacePlaceholdersInString(filePath, config)
+		if err != nil {
+			return err
+		}
+		fullPath = filepath.Join(projectPath, filePath)
 		if err := processTemplate(fullPath, tmpl, config); err != nil {
 			return err
 		}
@@ -170,4 +176,53 @@ type Metadata struct {
 	ArtifactId  string
 	Description string
 	Name        string
+}
+
+type StringReplacer string
+
+const (
+	CamelCase     StringReplacer = "camelCase"
+	DotsToSlashes StringReplacer = "dotsToSlashes"
+)
+
+// replacePlaceholdersInString replaces placeholders in a string with values from the config
+func replacePlaceholdersInString(s string, config Config, rules ...StringReplacer) (string, error) {
+	for _, rule := range rules {
+		switch rule {
+		case CamelCase:
+			// Replace placeholders in camelCase
+			withRules, err := toCamelCase(config.Metadata.PackageName)
+			if err != nil {
+				return "", err
+			}
+			s = strings.ReplaceAll(s, "{{.Metadata.PackageName}}", withRules)
+		case DotsToSlashes:
+			// Replace dots with slashes
+			s = strings.ReplaceAll(s, ".", "/")
+		default:
+			return "", fmt.Errorf("unsupported string replacer: %s", rule)
+		}
+	}
+
+	return s, nil
+}
+
+// toCamelCase converts a string to camelCase
+func toCamelCase(s string) (string, error) {
+	// Split the string by spaces
+	parts := strings.Fields(s)
+
+	// Convert each word to camelCase
+	for i, part := range parts {
+		if i == 0 {
+			// Lowercase the first word
+			parts[i] = strings.ToLower(part)
+		} else {
+			// Uppercase the first letter of the word
+			parts[i] = strings.ToUpper(part[:1]) + part[1:]
+		}
+	}
+
+	// Join the words back together
+	return strings.Join(parts, ""), nil
 }

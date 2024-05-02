@@ -5,5 +5,28 @@ tasks:
   default:
     desc: Run Build
     cmds:
-      - cmd: go build -o bin/{{.ITEM}} ./plugins/{{.ITEM}}/main.go
+      - task: "{{OS}}"
+
+  ############################################################
+  windows:
+    desc: Run Build
+    cmds:
+      ## Build for Windows
+      - cmd: GOOS=windows GOARCH=amd64 go build -o bin/{{.ITEM}}.exe ./plugins/{{.ITEM}}/main.go
+        for: ['go-apiserver', 'java-springbootapp']
+
+  ############################################################
+    linux:
+      desc: Run Build
+      cmds:
+      ## Build for Linux
+      - cmd: GOOS=linux GOARCH=amd64 go build -o bin/{{.ITEM}} ./plugins/{{.ITEM}}/main.go
+        for: ['go-apiserver', 'java-springbootapp']
+
+  ############################################################
+  darwin:
+    desc: Run Build
+    cmds:
+      ## Build for MacOS
+      - cmd: GOOS=darwin GOARCH=amd64 go build -o bin/{{.ITEM}} ./plugins/{{.ITEM}}/main.go
         for: ['go-apiserver', 'java-springbootapp']
